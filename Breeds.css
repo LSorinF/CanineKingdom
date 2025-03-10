@@ -1,0 +1,70 @@
+﻿body
+{
+}
+
+.frenchBull{
+    margin: 0px 0px 0px 250px;
+    position: relative;
+}
+
+.goldenRetriever {
+    margin: 0px 0px 0px 200px;
+    position: relative;
+}
+
+.labradorRetriever {
+    margin: 0px 0px 0px 200px;
+    position: relative;
+}
+
+#frenchBullName {
+    bottom: 360px;
+    left: 285px;
+    color: ghostwhite;
+    font-size: 25px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: cursive;
+    padding: 5px;
+}
+
+#goldenRetrieverName {
+    bottom: 360px;
+    left: 1515px;
+    color: ghostwhite;
+    font-size: 25px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: cursive;
+    padding: 5px;
+}
+
+#labradorRetrieverName {
+    bottom: 360px;
+    left: 855px;
+    color: ghostwhite;
+    font-size: 25px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: cursive;
+    padding: 5px;
+}
+
+
+#Button {
+    left: 1600px;
+    bottom: 270px;
+    inline-size: 250px;
+    position: absolute;
+    background-color: limegreen;
+    font-family: cursive;
+}
+
+#top3 {
+    font-size: 35px;
+    font-family: cursive;
+    text-align: center;
+    position: relative;
+    right: 500px;
+    top: 20px;
+}
