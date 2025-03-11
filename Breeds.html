@@ -9,6 +9,7 @@
     <title>Breeds</title>
     <link rel="stylesheet" href="Breeds.css" />
     <link rel="stylesheet" href="MainPage.css" />
+    <link rel="stylesheet" href="AllBreeds.css" />
 
 </head>
 <body style="background-color: antiquewhite">
@@ -24,35 +25,48 @@
     </nav>
 
 
-    <div class="content">
+    <div class="slides">
         <h1>What's your type of dog?</h1>
     </div>
 
-    <div>
-
+    
+    <div class="row">
         <p id="top3">Here's the Top 3 most popular dog breeds:</p>
-        
-        <div class="row mt-5">
-            <div class="col-sm-4">
-                <img class="frenchBull" src="Photos/French-bulldog.jpg" width="250px" height="300px" />
-                <p id="frenchBullName">French Bulldog</p>
+
+        <div class="row">
+            <div class="container">
+                <div class="col-sm">
+                    <img id="image" src="Photos/French-bulldog.jpg" width="250px" height="300px" />
+
+                    <div class="centered">Dog Race</div>
+                </div>
             </div>
-            <div class="col-sm-4">
-                 <img class="labradorRetriever" src="Photos/Labrador-Retriever.jpg" width="250px" height="300px" />
-                 <p id="labradorRetrieverName">Labrador-Retriever</p>
+            <div class="container">
+                <div class="col-sm">
+                    <img id="image" src="Photos/French-bulldog.jpg" width="250px" height="300px" />
+
+                    <div class="centered">Dog Race</div>
+                </div>
             </div>
-            <div class="col-sm-4">
-                <img class="goldenRetriever" src="Photos/Golden-Retriever.jpg" width="250px" height="300px" />
-                <p id="goldenRetrieverName">Golden-Retriever</p>
+            <div class="container">
+                <div class="col-sm">
+                    <img id="image" src="Photos/French-bulldog.jpg" width="250px" height="300px" />
+
+                    <div class="centered">Dog Race</div>
+                </div>
             </div>
         </div>
-    </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <a href="AllBreeds.html">
+                    <button id="Button">
+                        Other Races ->
+                    </button>
+                </a>
+            </div>
 
-    <a href="AllBreeds.html">
-        <button id="Button">
-            Other Races ->
-        </button>
-    </a>
+        </div>
+    </div>
 
 </body>
 </html>

@@ -52,10 +52,9 @@
 
 
 #Button {
-    left: 1600px;
-    bottom: 270px;
-    inline-size: 250px;
-    position: absolute;
+    position: relative;
+    left: 90%;
+    top: 30%;
     background-color: limegreen;
     font-family: cursive;
 }
@@ -65,6 +64,4 @@
     font-family: cursive;
     text-align: center;
     position: relative;
-    right: 500px;
-    top: 20px;
 }
