@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CanineKingdom</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CanineKingdom.styles.css" asp-append-version="true" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="flex flex-col h-screen">
+        <!-- Top Navigation Bar -->
+        <header class="bg-green-300 text-white p-4 shadow-md flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><img src="~/Images/IconDog.jpg" height="40px" width="40px" /></h1>
+            <nav class="flex flex-1 justify-center">
+                <ul class="flex space-x-6 text-black">
+                    <li><a class="hover:text-green-700" asp-area="" asp-controller="Home" asp-action="Index">🏡 Home</a></li>
+                    <li><a class="hover:text-green-700" asp-area="" asp-controller="Breeds" asp-action="Index">🐕 Breeds</a></li>
+                    <li><a class="hover:text-green-700" asp-area="" asp-controller="Events" asp-action="Index">🐾 Events</a></li>
+                    <li><a class="hover:text-green-700" asp-area="" asp-controller="Forum" asp-action="Index">🛍️ Forum</a></li>
+                    <li><a class="hover:text-green-700" asp-area="" asp-controller="Contact" asp-action="Index">👤 Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex flex-1 flex-col bg-amber-100">
+            <main role="main" class="flex-grow p-10">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Menu for Mobile
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            document.getElementById('menu').classList.toggle('hidden');
+        });
+    </script>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted bg-amber-200">
+        <div class="container flex flex-1 justify-center">
+            &copy; 2025 - CanineKingdom - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
