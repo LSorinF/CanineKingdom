@@ -1,15 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CanineKingdom.Models
 {
-    public class Comment 
+    public class Comment : BaseClass
     {
-        public int Id { get; set; }
-        public int ArticleId { get; set; } 
-        [ForeignKey("ArticleId")]
-        public string CommentText { get; set; }
-        public string CreatedAt { get; set; }
 
-        public Article Articles { get; set; }
+        [ForeignKey("User")]
+        public int UserId { get; set; }
+
+        [ForeignKey("Article")]
+        public int ArticleId { get; set; }
+
+        public string CommentText { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+
+        public User User { get; set; }
+        public Article Article { get; set; }
     }
 }

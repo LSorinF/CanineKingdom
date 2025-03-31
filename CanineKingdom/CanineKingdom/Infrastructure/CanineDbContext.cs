@@ -16,16 +16,16 @@ namespace CanineKingdom.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Users)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.SetNull); // Prevents multiple cascade paths
+               .HasOne(c => c.User)
+               .WithMany(u => u.Comments)
+               .HasForeignKey(c => c.UserId)
+               .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
 
             modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Articles)
+                .HasOne(c => c.Article)
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.ArticleId)
-                .OnDelete(DeleteBehavior.Cascade); // Still allows cascading for articles
+                .OnDelete(DeleteBehavior.Cascade); // Allows cascading delete for articles
         }
 
     }

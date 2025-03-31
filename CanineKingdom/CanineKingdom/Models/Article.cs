@@ -8,7 +8,6 @@
         public string PublishedAt { get; set; }
 
         public User User { get; set; }
-
         public ICollection<Comment> Comments { get; set; }
     }
 }
