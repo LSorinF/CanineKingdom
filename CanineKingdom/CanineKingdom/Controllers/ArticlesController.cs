@@ -10,22 +10,23 @@ using CanineKingdom.Models;
 
 namespace CanineKingdom.Controllers
 {
-    public class BreedsController : Controller
+    public class ArticlesController : Controller
     {
         private readonly CanineDbContext _context;
 
-        public BreedsController(CanineDbContext context)
+        public ArticlesController(CanineDbContext context)
         {
             _context = context;
         }
 
-        // GET: Breeds
+        // GET: Articles
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Breeds.ToListAsync());
+            var canineDbContext = _context.Articles.Include(a => a.User);
+            return View(await canineDbContext.ToListAsync());
         }
 
-        // GET: Breeds/Details/5
+        // GET: Articles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +34,43 @@ namespace CanineKingdom.Controllers
                 return NotFound();
             }
 
-            var breed = await _context.Breeds
+            var article = await _context.Articles
+                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (breed == null)
+            if (article == null)
             {
                 return NotFound();
             }
 
-            return View(breed);
+            return View(article);
         }
 
-        // GET: Breeds/Create
+        // GET: Articles/Create
         public IActionResult Create()
         {
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Breeds/Create
+        // POST: Articles/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Size,Origin,HairSize,Lifespan,Classification,Id")] Breed breed)
+        public async Task<IActionResult> Create([Bind("UserId,Title,Content,Id")] Article article)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(breed);
+                article.PublishedAt = DateTime.Now;
+                _context.Add(article);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(breed);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
+            return View(article);
         }
 
-        // GET: Breeds/Edit/5
+        // GET: Articles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +78,23 @@ namespace CanineKingdom.Controllers
                 return NotFound();
             }
 
-            var breed = await _context.Breeds.FindAsync(id);
-            if (breed == null)
+            var article = await _context.Articles.FindAsync(id);
+            if (article == null)
             {
                 return NotFound();
             }
-            return View(breed);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
+            return View(article);
         }
 
-        // POST: Breeds/Edit/5
+        // POST: Articles/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Size,Origin,HairSize,Lifespan,Classification,Id")] Breed breed)
+        public async Task<IActionResult> Edit(int id, [Bind("UserId,Title,Content,PublishedAt,Id")] Article article)
         {
-            if (id != breed.Id)
+            if (id != article.Id)
             {
                 return NotFound();
             }
@@ -97,12 +103,12 @@ namespace CanineKingdom.Controllers
             {
                 try
                 {
-                    _context.Update(breed);
+                    _context.Update(article);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BreedExists(breed.Id))
+                    if (!ArticleExists(article.Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +119,11 @@ namespace CanineKingdom.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(breed);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
+            return View(article);
         }
 
-        // GET: Breeds/Delete/5
+        // GET: Articles/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +131,35 @@ namespace CanineKingdom.Controllers
                 return NotFound();
             }
 
-            var breed = await _context.Breeds
+            var article = await _context.Articles
+                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (breed == null)
+            if (article == null)
             {
                 return NotFound();
             }
 
-            return View(breed);
+            return View(article);
         }
 
-        // POST: Breeds/Delete/5
+        // POST: Articles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var breed = await _context.Breeds.FindAsync(id);
-            if (breed != null)
+            var article = await _context.Articles.FindAsync(id);
+            if (article != null)
             {
-                _context.Breeds.Remove(breed);
+                _context.Articles.Remove(article);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BreedExists(int id)
+        private bool ArticleExists(int id)
         {
-            return _context.Breeds.Any(e => e.Id == id);
+            return _context.Articles.Any(e => e.Id == id);
         }
     }
 }

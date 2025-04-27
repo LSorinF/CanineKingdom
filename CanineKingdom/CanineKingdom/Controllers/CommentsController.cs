@@ -54,10 +54,12 @@ namespace CanineKingdom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,ArticleId,CommentText,CreatedAt,Id")] Comment comment)
+        public async Task<IActionResult> Create([Bind("UserId,CommentText")] Comment comment)
         {
             if (ModelState.IsValid)
             {
+                comment.CreatedAt = DateTime.Now;
+                comment.ArticleId = 1;
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

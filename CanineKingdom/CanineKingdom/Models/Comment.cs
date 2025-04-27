@@ -18,7 +18,7 @@ namespace CanineKingdom.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
-        public User User { get; set; }
-        public Article Article { get; set; }
+        public User? User { get; set; }
+        public Article? Article { get; set; }
     }
 }
