@@ -1,143 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CanineKingdom.Models;
+using CanineKingdom.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CanineKingdom.Infrastructure;
-using CanineKingdom.Models;
 
 namespace CanineKingdom.Controllers
 {
     public class ArticlesController : Controller
     {
-        private readonly CanineDbContext _context;
+        private readonly IArticleService _articleService;
+        private readonly IUserService _userService; // For SelectList of Users
 
-        public ArticlesController(CanineDbContext context)
+        public ArticlesController(IArticleService articleService, IUserService userService)
         {
-            _context = context;
+            _articleService = articleService;
+            _userService = userService;
         }
 
         // GET: Articles
-        public async Task<IActionResult> Index()
+        // GET: Articles
+        public async Task<IActionResult> Index(string searchString)
         {
-            var canineDbContext = _context.Articles.Include(a => a.User);
-            return View(await canineDbContext.ToListAsync());
+            var articles = await _articleService.SearchArticlesByTitleAsync(searchString);
+            return View(articles);
         }
+
 
         // GET: Articles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var article = await _context.Articles
-                .Include(a => a.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var article = await _articleService.GetArticleDetailsAsync(id);
             if (article == null)
-            {
                 return NotFound();
-            }
 
             return View(article);
         }
 
         // GET: Articles/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["UserId"] = new SelectList(await _userService.GetAllUsersAsync(), "Id", "Id");
             return View();
         }
 
         // POST: Articles/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,Title,Content,Id")] Article article)
         {
             if (ModelState.IsValid)
             {
-                article.PublishedAt = DateTime.Now;
-                _context.Add(article);
-                await _context.SaveChangesAsync();
+                await _articleService.CreateArticleAsync(article);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
+
+            ViewData["UserId"] = new SelectList(await _userService.GetAllUsersAsync(), "Id", "Id", article.UserId);
             return View(article);
         }
 
         // GET: Articles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var article = await _context.Articles.FindAsync(id);
+            var article = await _articleService.GetArticleForEditAsync(id);
             if (article == null)
-            {
                 return NotFound();
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
+
+            ViewData["UserId"] = new SelectList(await _userService.GetAllUsersAsync(), "Id", "Id", article.UserId);
             return View(article);
         }
 
         // POST: Articles/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,Title,Content,PublishedAt,Id")] Article article)
         {
-            if (id != article.Id)
-            {
+            if (!await _articleService.UpdateArticleAsync(id, article))
                 return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(article);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ArticleExists(article.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", article.UserId);
-            return View(article);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Articles/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var article = await _context.Articles
-                .Include(a => a.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var article = await _articleService.GetArticleForDeleteAsync(id);
             if (article == null)
-            {
                 return NotFound();
-            }
 
             return View(article);
         }
@@ -147,19 +94,8 @@ namespace CanineKingdom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var article = await _context.Articles.FindAsync(id);
-            if (article != null)
-            {
-                _context.Articles.Remove(article);
-            }
-
-            await _context.SaveChangesAsync();
+            await _articleService.DeleteArticleAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ArticleExists(int id)
-        {
-            return _context.Articles.Any(e => e.Id == id);
         }
     }
 }

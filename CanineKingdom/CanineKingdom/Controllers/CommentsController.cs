@@ -1,44 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CanineKingdom.Models;
+using CanineKingdom.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CanineKingdom.Infrastructure;
-using CanineKingdom.Models;
 
 namespace CanineKingdom.Controllers
 {
     public class CommentsController : Controller
     {
-        private readonly CanineDbContext _context;
+        private readonly ICommentService _commentService;
 
-        public CommentsController(CanineDbContext context)
+        public CommentsController(ICommentService commentService)
         {
-            _context = context;
+            _commentService = commentService;
         }
 
         // GET: Comments
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Comments.ToListAsync());
+            var comments = await _commentService.GetAllCommentsAsync();
+            return View(comments);
         }
 
         // GET: Comments/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentService.GetCommentDetailsAsync(id);
             if (comment == null)
-            {
                 return NotFound();
-            }
 
             return View(comment);
         }
@@ -50,18 +37,13 @@ namespace CanineKingdom.Controllers
         }
 
         // POST: Comments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,CommentText")] Comment comment)
         {
             if (ModelState.IsValid)
             {
-                comment.CreatedAt = DateTime.Now;
-                comment.ArticleId = 1;
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                await _commentService.CreateCommentAsync(comment);
                 return RedirectToAction(nameof(Index));
             }
             return View(comment);
@@ -70,49 +52,24 @@ namespace CanineKingdom.Controllers
         // GET: Comments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _commentService.GetCommentForEditAsync(id);
             if (comment == null)
-            {
                 return NotFound();
-            }
+
             return View(comment);
         }
 
         // POST: Comments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,ArticleId,CommentText,CreatedAt,Id")] Comment comment)
         {
-            if (id != comment.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(comment);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CommentExists(comment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                var result = await _commentService.UpdateCommentAsync(id, comment);
+                if (!result)
+                    return NotFound();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(comment);
@@ -121,17 +78,9 @@ namespace CanineKingdom.Controllers
         // GET: Comments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var comment = await _commentService.GetCommentForDeleteAsync(id);
             if (comment == null)
-            {
                 return NotFound();
-            }
 
             return View(comment);
         }
@@ -141,19 +90,8 @@ namespace CanineKingdom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment != null)
-            {
-                _context.Comments.Remove(comment);
-            }
-
-            await _context.SaveChangesAsync();
+            await _commentService.DeleteCommentAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CommentExists(int id)
-        {
-            return _context.Comments.Any(e => e.Id == id);
         }
     }
 }
