@@ -41,15 +41,15 @@ namespace CanineKingdom.Controllers
         // POST: Users/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(User user)
+        public async Task<IActionResult> Create(ApplicationUser appUser)
         {
             if (ModelState.IsValid)
             {
-                var result = await _userService.CreateUserAsync(user);
+                var result = await _userService.CreateUserAsync(appUser);
                 if (result)
                     return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(appUser);
         }
 
         // GET: Users/Edit/5
@@ -65,17 +65,17 @@ namespace CanineKingdom.Controllers
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, User user)
+        public async Task<IActionResult> Edit(int id, ApplicationUser appUser)
         {
             if (ModelState.IsValid)
             {
-                var result = await _userService.UpdateUserAsync(id, user);
+                var result = await _userService.UpdateUserAsync(id, appUser);
                 if (result)
                     return RedirectToAction(nameof(Index));
                 else
                     return NotFound();
             }
-            return View(user);
+            return View(appUser);
         }
 
         // GET: Users/Delete/5

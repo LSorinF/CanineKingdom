@@ -1,74 +1,56 @@
 ﻿@model IEnumerable<CanineKingdom.Models.Breed>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Breeds";
+    var isAdmin = User.IsInRole("Administrator");
 }
 
-<h1>Index</h1>
+<div class="p-8 bg-white rounded shadow-md max-w-7xl mx-auto mt-8">
+    <h1 class="text-4xl font-bold text-center text-green-700 mb-6">Dog Breeds</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<form asp-action="Index" method="get">
-    <div class="form-group">
-        <input type="text" name="searchString" class="form-control" placeholder="Search breeds by name..." />
-        <input type="submit" value="Search" class="btn btn-primary mt-2" />
+    <div class="overflow-x-auto">
+        <table class="min-w-full table-auto border border-gray-300 shadow-md">
+            <thead class="bg-green-200 text-left text-gray-700 uppercase text-sm">
+                <tr>
+                    <th class="px-6 py-3">Name</th>
+                    <th class="px-6 py-3">Size</th>
+                    <th class="px-6 py-3">Origin</th>
+                    <th class="px-6 py-3">Hair Size</th>
+                    <th class="px-6 py-3">Lifespan</th>
+                    <th class="px-6 py-3">Classification</th>
+                    @if (isAdmin)
+                    {
+                        <th class="px-6 py-3 text-center">Actions</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var breed in Model)
+                {
+                    <tr class="border-t hover:bg-amber-100">
+                        <td class="px-6 py-4">@breed.Name</td>
+                        <td class="px-6 py-4">@breed.Size</td>
+                        <td class="px-6 py-4">@breed.Origin</td>
+                        <td class="px-6 py-4">@breed.HairSize</td>
+                        <td class="px-6 py-4">@breed.Lifespan years</td>
+                        <td class="px-6 py-4">@breed.Classification</td>
+                        @if (isAdmin)
+                        {
+                            <td class="px-6 py-4 text-center space-x-3">
+                                <a asp-action="Edit" asp-route-id="@breed.Id" class="text-blue-600 hover:underline">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@breed.Id" class="text-red-600 hover:underline">Delete</a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</form>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Size)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Origin)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HairSize)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lifespan)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Classification)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Size)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Origin)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HairSize)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lifespan)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Classification)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    @if (isAdmin)
+    {
+        <div class="text-right mt-4">
+            <a asp-action="Create" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow">Add New Breed</a>
+        </div>
+    }
+</div>

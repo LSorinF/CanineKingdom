@@ -1,26 +1,16 @@
 ﻿using CanineKingdom.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CanineKingdom.Services.Interfaces
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<List<User>> GetAllUsersAsync();
-
-        Task<User> GetUserDetailsAsync(int? id);
-
-        Task<bool> CreateUserAsync(User user);
-
-        Task<User> GetUserForEditAsync(int? id);
-
-        Task<bool> UpdateUserAsync(int id, User user);
-
-        Task<User> GetUserForDeleteAsync(int? id);
-
-        Task<bool> DeleteUserAsync(int id);
-
-        Task<bool> UserExistsAsync(int id);
-
-        Task<List<User>> SearchUsersAsync(string searchString);
-
-    }
+    Task<List<ApplicationUser>> GetAllUsersAsync();
+    Task<ApplicationUser> GetUserDetailsAsync(int? id);
+    Task<bool> CreateUserAsync(ApplicationUser user);
+    Task<ApplicationUser> GetUserForEditAsync(int? id);
+    Task<bool> UpdateUserAsync(int id, ApplicationUser user);
+    Task<ApplicationUser> GetUserForDeleteAsync(int? id);
+    Task<bool> DeleteUserAsync(int id);
+    Task<bool> UserExistsAsync(int id);
+    Task<List<ApplicationUser>> SearchUsersAsync(string searchString);
 }

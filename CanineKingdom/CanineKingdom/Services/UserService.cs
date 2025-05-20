@@ -1,108 +1,75 @@
-﻿using CanineKingdom.Infrastructure;
-using CanineKingdom.Models;
+﻿using CanineKingdom.Models;
 using CanineKingdom.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using CanineKingdom.Repositories.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace CanineKingdom.Services
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly IUserServiceRepository _repository;
+
+    public UserService(IUserServiceRepository repository)
     {
-        private readonly CanineDbContext _context;
+        _repository = repository;
+    }
 
-        public UserService(CanineDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<List<ApplicationUser>> GetAllUsersAsync()
+    {
+        return await _repository.GetAllAsync();
+    }
 
-        public async Task<List<User>> GetAllUsersAsync()
-        {
-            return await _context.Users.ToListAsync();
-        }
+    public async Task<ApplicationUser> GetUserDetailsAsync(int? id)
+    {
+        if (id == null) return null;
+        return await _repository.GetByIdAsync(id.Value);
+    }
 
-        public async Task<User> GetUserDetailsAsync(int? id)
-        {
-            if (id == null)
-                return null;
+    public async Task<bool> CreateUserAsync(ApplicationUser user)
+    {
+        if (user == null) return false;
+        await _repository.AddAsync(user);
+        return true;
+    }
 
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-        }
+    public async Task<ApplicationUser> GetUserForEditAsync(int? id)
+    {
+        if (id == null) return null;
+        return await _repository.GetByIdAsync(id.Value);
+    }
 
-        public async Task<bool> CreateUserAsync(User user)
-        {
-            if (user == null)
-                return false;
+    public async Task<bool> UpdateUserAsync(int id, ApplicationUser user)
+    {
+        if (id != user.Id) return false;
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        if (!await _repository.ExistsAsync(id))
+            return false;
 
-        public async Task<User> GetUserForEditAsync(int? id)
-        {
-            if (id == null)
-                return null;
+        await _repository.UpdateAsync(user);
+        return true;
+    }
 
-            return await _context.Users.FindAsync(id);
-        }
+    public async Task<ApplicationUser> GetUserForDeleteAsync(int? id)
+    {
+        if (id == null) return null;
+        return await _repository.GetByIdAsync(id.Value);
+    }
 
-        public async Task<bool> UpdateUserAsync(int id, User user)
-        {
-            if (id != user.Id)
-                return false;
+    public async Task<bool> DeleteUserAsync(int id)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user == null) return false;
 
-            try
-            {
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExistsAsync(user.Id))
-                    return false;
-                else
-                    throw;
-            }
-        }
+        await _repository.DeleteAsync(user);
+        return true;
+    }
 
-        public async Task<User> GetUserForDeleteAsync(int? id)
-        {
-            if (id == null)
-                return null;
+    public async Task<bool> UserExistsAsync(int id)
+    {
+        return await _repository.ExistsAsync(id);
+    }
 
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-        }
-
-        public async Task<bool> DeleteUserAsync(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-                return false;
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> UserExistsAsync(int id)
-        {
-            return await _context.Users.AnyAsync(u => u.Id == id);
-        }
-
-        public async Task<List<User>> SearchUsersAsync(string searchString)
-        {
-            if (string.IsNullOrEmpty(searchString))
-            {
-                return await _context.Users.ToListAsync();
-            }
-
-            return await _context.Users
-                .Where(u => u.Username.ToLower().Contains(searchString.ToLower()))
-                .ToListAsync();
-        }
-
+    public async Task<List<ApplicationUser>> SearchUsersAsync(string searchString)
+    {
+        return await _repository.SearchByUsernameAsync(searchString);
     }
 }

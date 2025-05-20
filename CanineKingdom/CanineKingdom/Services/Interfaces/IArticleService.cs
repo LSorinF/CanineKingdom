@@ -4,14 +4,14 @@ namespace CanineKingdom.Services.Interfaces
 {
     public interface IArticleService
     {
-        Task<List<Article>> GetAllArticlesAsync();
-        Task<List<Article>> SearchArticlesByTitleAsync(string searchString);
-        Task<Article> GetArticleDetailsAsync(int? id);
-        Task<bool> CreateArticleAsync(Article article);
-        Task<Article> GetArticleForEditAsync(int? id);
-        Task<bool> UpdateArticleAsync(int id, Article article);
-        Task<Article> GetArticleForDeleteAsync(int? id);
-        Task<bool> DeleteArticleAsync(int id);
-        Task<bool> ArticleExistsAsync(int id);
+        Task<List<Article>> GetAllAsync();
+        Task<Article> GetByIdAsync(int id);
+        Task CreateAsync(Article article);
+        Task UpdateAsync(Article article);
+        Task DeleteAsync(int id);
+        Task ReactToArticleAsync(int articleId, string userId, ReactionType reaction);
+        //Task AddCommentAsync(int articleId, string content);
+        //Task<IEnumerable<ArticleComment>> GetCommentsAsync(int articleId);
+        //Task<int> CountReactionsAsync(int articleId, ReactionType reactionType);
     }
 }

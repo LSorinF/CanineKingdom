@@ -1,6 +1,7 @@
 ﻿using CanineKingdom.Models;
 using CanineKingdom.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CanineKingdom.Controllers
 {
@@ -28,7 +29,7 @@ namespace CanineKingdom.Controllers
 
             return View(breed);
         }
-
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();

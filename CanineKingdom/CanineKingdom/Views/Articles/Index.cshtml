@@ -1,62 +1,87 @@
-﻿@model IEnumerable<CanineKingdom.Models.Article>
+﻿@model CanineKingdom.Models.Article
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@using System.Security.Claims
+
+@functions {
+    private ApplicationUser currentUser;
+    public async Task LoadUserAsync(ClaimsPrincipal userPrincipal)
+    {
+        currentUser = await UserManager.GetUserAsync(userPrincipal);
+    }
+}
 
 @{
-    ViewData["Title"] = "Index";
+    await LoadUserAsync(User);
+    var userAccountNumber = currentUser?.AccountNumber;
+    var userReaction = Model.Reactions?.FirstOrDefault(r => r.UserAccountNumber == userAccountNumber);
 }
 
-<h1>Index</h1>
+<link rel="stylesheet" href="~/css/articles.css" />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="article-container">
+    <h1 class="article-title">@Model.Title</h1>
+    <div class="article-meta">
+        <span>By <strong>@Model.Author?.UserName</strong> on @Model.PublishedAt.ToString("MMMM dd, yyyy")</span>
+    </div>
 
-<form asp-action="Index" method="get">
-    <p>
-        Title: <input type="text" name="searchString" value="@Context.Request.Query["searchString"]" />
-        <input type="submit" value="Search" />
-    </p>
-</form>
+    <div class="article-content">
+        @Html.Raw(Model.Content)
+    </div>
 
+    <div class="article-reactions">
+        <form asp-action="React" method="post">
+            <input type="hidden" name="articleId" value="@Model.Id" />
+            <button type="submit" name="reaction" value="Like" class="btn-like @(userReaction?.Reaction == ReactionType.Like ? "active" : "")">👍 Like</button>
+            <button type="submit" name="reaction" value="Dislike" class="btn-dislike @(userReaction?.Reaction == ReactionType.Dislike ? "active" : "")">👎 Dislike</button>
+        </form>
+        <div class="reaction-counts">
+            <span>👍 @Model.Reactions?.Count(r => r.Reaction == ReactionType.Like)</span>
+            <span>👎 @Model.Reactions?.Count(r => r.Reaction == ReactionType.Dislike)</span>
+        </div>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PublishedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PublishedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <hr />
+
+    @* <div class="comments-section">
+        <h3>Comments (@Model.Comments?.Count)</h3>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-action="PostComment" method="post" class="comment-form">
+                <textarea name="Content" required placeholder="Leave a comment..."></textarea>
+                <input type="hidden" name="articleId" value="@Model.Id" />
+                <button type="submit">Post Comment</button>
+            </form>
+        }
+        else
+        {
+            <p><a href="/Identity/Account/Login">Log in</a> to post a comment.</p>
+        } *@
+
+        @* <ul class="comment-list">
+            @foreach (var comment in Model.Comments.OrderByDescending(c => c.PostedAt))
+            {
+                var commentReaction = comment.Reactions?.FirstOrDefault(r => r.UserAccountNumber == userAccountNumber);
+
+                <li class="comment-item">
+                    <div class="comment-meta">
+                        <strong>@comment.Author?.UserName</strong> • @comment.PostedAt.ToString("g")
+                    </div>
+                    <div class="comment-content">
+                        @comment.Content
+                    </div>
+                    <form asp-action="ReactToComment" method="post" class="comment-reaction-form">
+                        <input type="hidden" name="commentId" value="@comment.Id" />
+                        <button type="submit" name="reaction" value="Like" class="btn-like @(commentReaction?.Reaction == ReactionType.Like ? "active" : "")">👍</button>
+                        <button type="submit" name="reaction" value="Dislike" class="btn-dislike @(commentReaction?.Reaction == ReactionType.Dislike ? "active" : "")">👎</button>
+                        <span class="reaction-count">
+                            👍 @comment.Reactions?.Count(r => r.Reaction == ReactionType.Like) |
+                            👎 @comment.Reactions?.Count(r => r.Reaction == ReactionType.Dislike)
+                        </span>
+                    </form>
+                </li>
+            }
+        </ul> *@
+    </div>
+</div>

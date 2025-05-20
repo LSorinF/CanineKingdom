@@ -7,10 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Comments\**" />
     <Compile Remove="Views\NewFolder1\**" />
+    <Content Remove="Views\Comments\**" />
     <Content Remove="Views\NewFolder1\**" />
+    <EmbeddedResource Remove="Views\Comments\**" />
     <EmbeddedResource Remove="Views\NewFolder1\**" />
+    <None Remove="Views\Comments\**" />
     <None Remove="Views\NewFolder1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\CommentsController.cs" />
+    <Compile Remove="Repositories\CommentsServiceRepository.cs" />
+    <Compile Remove="Repositories\Interfaces\ICommentsServiceRepository.cs" />
+    <Compile Remove="Services\CommentsService.cs" />
+    <Compile Remove="Services\Interfaces\ICommentsService.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,9 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

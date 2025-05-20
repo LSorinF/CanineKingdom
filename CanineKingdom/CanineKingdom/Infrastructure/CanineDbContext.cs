@@ -1,31 +1,47 @@
 ﻿using CanineKingdom.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CanineKingdom.Infrastructure
 {
-    public class CanineDbContext : DbContext
+    public class CanineDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
-        public CanineDbContext(DbContextOptions<CanineDbContext> options) : base(options) { }
+        public CanineDbContext(DbContextOptions<CanineDbContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<Article> Articles { get; set; }
         public DbSet<Breed> Breeds { get; set; }
-        public DbSet<Comment> Comments { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<ArticleReaction> ArticleReactions { get; set; }
+        public DbSet<CommentReaction> CommentReactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Comment>()
-               .HasOne(c => c.User)
-               .WithMany(u => u.Comments)
-               .HasForeignKey(c => c.UserId)
-               .OnDelete(DeleteBehavior.Restrict); // Prevents cascade delete
+            base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Article)
-                .WithMany(a => a.Comments)
-                .HasForeignKey(c => c.ArticleId)
-                .OnDelete(DeleteBehavior.Cascade); // Allows cascading delete for articles
+            // Make sure AccountNumber is alternate key (unique)
+            modelBuilder.Entity<ApplicationUser>()
+                .HasAlternateKey(u => u.AccountNumber);
+
+            // ArticleComment -> CommentReactions (cascade delete allowed here)
+            //modelBuilder.Entity<ArticleComment>()
+            //    .HasMany(c => c.Reactions)
+            //    .WithOne(r => r.ArticleComment)
+            //    .HasForeignKey(r => r.ArticleCommentId)
+            //    .OnDelete(DeleteBehavior.NoAction);
+
+            //CommentReaction->ApplicationUser by AccountNumber
+            //modelBuilder.Entity<CommentReaction>()
+            //    .HasOne(r => r.User)
+            //    .WithMany()
+            //    .HasForeignKey(r => r.UserAccountNumber)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
+            // Remove duplicates: only one relation per FK!
         }
 
     }

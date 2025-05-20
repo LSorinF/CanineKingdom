@@ -7,16 +7,16 @@ namespace CanineKingdom.Services
 {
     public class CommentService : ICommentService
     {
-        private readonly CanineDbContext _context;
+        private readonly CanineDbContext _repository;
 
         public CommentService(CanineDbContext context)
         {
-            _context = context;
+            _repository = context;
         }
 
         public async Task<List<Comment>> GetAllCommentsAsync()
         {
-            return await _context.Comments.ToListAsync();
+            return await _repository.Comments.ToListAsync();
         }
 
         public async Task<Comment> GetCommentDetailsAsync(int? id)
@@ -24,7 +24,7 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+            return await _repository.Comments.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<bool> CreateCommentAsync(Comment comment)
@@ -34,8 +34,8 @@ namespace CanineKingdom.Services
 
             comment.CreatedAt = DateTime.Now;
             comment.ArticleId = 1; // Hardcoded or change if needed
-            _context.Comments.Add(comment);
-            await _context.SaveChangesAsync();
+            _repository.Comments.Add(comment);
+            await _repository.SaveChangesAsync();
             return true;
         }
 
@@ -44,7 +44,7 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Comments.FindAsync(id);
+            return await _repository.Comments.FindAsync(id);
         }
 
         public async Task<bool> UpdateCommentAsync(int id, Comment comment)
@@ -54,8 +54,8 @@ namespace CanineKingdom.Services
 
             try
             {
-                _context.Update(comment);
-                await _context.SaveChangesAsync();
+                _repository.Update(comment);
+                await _repository.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -72,23 +72,23 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+            return await _repository.Comments.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<bool> DeleteCommentAsync(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _repository.Comments.FindAsync(id);
             if (comment == null)
                 return false;
 
-            _context.Comments.Remove(comment);
-            await _context.SaveChangesAsync();
+            _repository.Comments.Remove(comment);
+            await _repository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> CommentExistsAsync(int id)
         {
-            return await _context.Comments.AnyAsync(c => c.Id == id);
+            return await _repository.Comments.AnyAsync(c => c.Id == id);
         }
     }
 }

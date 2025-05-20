@@ -1,13 +1,23 @@
-﻿namespace CanineKingdom.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace CanineKingdom.Models
 {
     public class Article : BaseClass
     {
-        public int UserId { get; set; }
+        [Required]
         public string Title { get; set; }
-        public string Content { get; set; }
-        public DateTime PublishedAt { get; set; }
 
-        public User? User { get; set; }
-        public ICollection<Comment>? Comments { get; set; }
+        [Required]
+        public string Content { get; set; }
+
+        public DateTime PublishedAt { get; set; } = DateTime.UtcNow;
+
+        public int AuthorId { get; set; }
+        public ApplicationUser Author { get; set; }
+
+        //public ICollection<ArticleComment> Comments { get; set; }
+        public ICollection<ArticleReaction> Reactions { get; set; }
     }
+
 }

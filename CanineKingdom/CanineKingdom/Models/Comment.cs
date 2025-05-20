@@ -6,19 +6,18 @@ namespace CanineKingdom.Models
 {
     public class Comment : BaseClass
     {
+        [Required]
+        public string CommentText { get; set; }  // ✅ Renamed from Content
 
-        [ForeignKey("User")]
-        public int UserId { get; set; }
+        public DateTime PostedAt { get; set; } = DateTime.UtcNow;
 
-        [ForeignKey("Article")]
+        public string UserId { get; set; }       // ✅ Renamed from AuthorId
+        public ApplicationUser User { get; set; } // ✅ Renamed from Author
+
         public int ArticleId { get; set; }
+        public Article Article { get; set; }
 
-        public string CommentText { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-
-        public User? User { get; set; }
-        public Article? Article { get; set; }
+        public ICollection<CommentReaction> Reactions { get; set; }
     }
+
 }

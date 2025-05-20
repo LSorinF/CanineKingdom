@@ -1,8 +1,12 @@
 ﻿using CanineKingdom.Models;
 
-namespace CanineKingdom.Repositories.Interfaces
+public interface IUserServiceRepository
 {
-    public interface IUserServiceRepository : IRepositoryBase<User>
-    {
-    }
+    Task<List<ApplicationUser>> GetAllAsync();
+    Task<ApplicationUser> GetByIdAsync(int id);
+    Task AddAsync(ApplicationUser user);
+    Task UpdateAsync(ApplicationUser user);
+    Task DeleteAsync(ApplicationUser user);
+    Task<bool> ExistsAsync(int id);
+    Task<List<ApplicationUser>> SearchByUsernameAsync(string searchString);
 }

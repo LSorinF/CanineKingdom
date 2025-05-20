@@ -7,24 +7,24 @@ namespace CanineKingdom.Services
 {
     public class BreedService : IBreedService
     {
-        private readonly CanineDbContext _context;
+        private readonly CanineDbContext _repository;
 
         public BreedService(CanineDbContext context)
         {
-            _context = context;
+            _repository = context;
         }
 
         public async Task<List<Breed>> GetAllBreedsAsync()
         {
-            return await _context.Breeds.ToListAsync();
+            return await _repository.Breeds.ToListAsync();
         }
 
         public async Task<List<Breed>> SearchBreedsByNameAsync(string searchString)
         {
             if (string.IsNullOrWhiteSpace(searchString))
-                return await _context.Breeds.ToListAsync();
+                return await _repository.Breeds.ToListAsync();
 
-            return await _context.Breeds
+            return await _repository.Breeds
                 .Where(b => EF.Functions.Like(b.Name.ToLower(), $"%{searchString.ToLower()}%"))
                 .ToListAsync();
         }
@@ -35,13 +35,13 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Breeds.FirstOrDefaultAsync(b => b.Id == id);
+            return await _repository.Breeds.FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<bool> CreateBreedAsync(Breed breed)
         {
-            _context.Breeds.Add(breed);
-            await _context.SaveChangesAsync();
+            _repository.Breeds.Add(breed);
+            await _repository.SaveChangesAsync();
             return true;
         }
 
@@ -50,7 +50,7 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Breeds.FindAsync(id);
+            return await _repository.Breeds.FindAsync(id);
         }
 
         public async Task<bool> UpdateBreedAsync(int id, Breed breed)
@@ -60,8 +60,8 @@ namespace CanineKingdom.Services
 
             try
             {
-                _context.Update(breed);
-                await _context.SaveChangesAsync();
+                _repository.Update(breed);
+                await _repository.SaveChangesAsync();
                 return true;
             }
             catch (DbUpdateConcurrencyException)
@@ -77,23 +77,23 @@ namespace CanineKingdom.Services
             if (id == null)
                 return null;
 
-            return await _context.Breeds.FirstOrDefaultAsync(b => b.Id == id);
+            return await _repository.Breeds.FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<bool> DeleteBreedAsync(int id)
         {
-            var breed = await _context.Breeds.FindAsync(id);
+            var breed = await _repository.Breeds.FindAsync(id);
             if (breed == null)
                 return false;
 
-            _context.Breeds.Remove(breed);
-            await _context.SaveChangesAsync();
+            _repository.Breeds.Remove(breed);
+            await _repository.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> BreedExistsAsync(int id)
         {
-            return await _context.Breeds.AnyAsync(e => e.Id == id);
+            return await _repository.Breeds.AnyAsync(e => e.Id == id);
         }
     }
 }

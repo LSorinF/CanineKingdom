@@ -14,95 +14,110 @@ namespace CanineKingdom.Services
             _context = context;
         }
 
-        public async Task<List<Article>> GetAllArticlesAsync()
+        //public async Task<List<Article>> GetAllAsync()
+        //{
+        //    return await _context.Articles
+        //        .Include(a => a.Author)
+        //        .Include(a => a.Reactions)
+        //        .Include(a => a.Comments)
+        //            .ThenInclude(c => c.Reactions)
+        //        .ToListAsync();
+        //}
+
+        //public async Task<Article> GetByIdAsync(int id)
+        //{
+        //    return await _context.Articles
+        //        .Include(a => a.Author)
+        //        .Include(a => a.Reactions)
+        //        .Include(a => a.Comments)
+        //            .ThenInclude(c => c.Author)
+        //        .Include(a => a.Comments)
+        //            .ThenInclude(c => c.Reactions)
+        //        .FirstOrDefaultAsync(a => a.Id == id);
+        //}
+
+        public async Task CreateAsync(Article article)
         {
-            return await _context.Articles.Include(a => a.User).ToListAsync();
-        }
-
-        public async Task<List<Article>> SearchArticlesByTitleAsync(string searchString)
-        {
-            var query = _context.Articles.Include(a => a.User).AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                query = query.Where(a => a.Title.ToLower().Contains(searchString.ToLower()));
-            }
-
-            return await query.ToListAsync();
-        }
-
-
-        public async Task<Article> GetArticleDetailsAsync(int? id)
-        {
-            if (id == null)
-                return null;
-
-            return await _context.Articles.Include(a => a.User)
-                                          .FirstOrDefaultAsync(a => a.Id == id);
-        }
-
-        public async Task<bool> CreateArticleAsync(Article article)
-        {
-            if (article == null)
-                return false;
-
-            article.PublishedAt = DateTime.Now;
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<Article> GetArticleForEditAsync(int? id)
+        public async Task UpdateAsync(Article article)
         {
-            if (id == null)
-                return null;
-
-            return await _context.Articles.FindAsync(id);
+            _context.Articles.Update(article);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateArticleAsync(int id, Article article)
-        {
-            if (id != article.Id)
-                return false;
-
-            try
-            {
-                _context.Articles.Update(article);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await ArticleExistsAsync(article.Id))
-                    return false;
-                else
-                    throw;
-            }
-        }
-
-        public async Task<Article> GetArticleForDeleteAsync(int? id)
-        {
-            if (id == null)
-                return null;
-
-            return await _context.Articles.Include(a => a.User)
-                                          .FirstOrDefaultAsync(a => a.Id == id);
-        }
-
-        public async Task<bool> DeleteArticleAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var article = await _context.Articles.FindAsync(id);
-            if (article == null)
-                return false;
-
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
-            return true;
+            if (article != null)
+            {
+                _context.Articles.Remove(article);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public async Task<bool> ArticleExistsAsync(int id)
+        //public async Task AddCommentAsync(int articleId, string content)
+        //{
+        //    var comment = new ArticleComment
+        //    {
+        //        ArticleId = articleId,
+        //        Content = content,
+        //        PostedAt = DateTime.UtcNow
+        //    };
+
+        //    _context.ArticleComments.Add(comment);
+        //    await _context.SaveChangesAsync();
+        //}
+
+        public async Task ReactToArticleAsync(int articleId, string authorId, ReactionType reaction)
         {
-            return await _context.Articles.AnyAsync(a => a.Id == id);
+            var existing = await _context.ArticleReactions
+                .FirstOrDefaultAsync(r => r.ArticleId == articleId && r.UserId == authorId);
+
+            if (existing == null)
+            {
+                _context.ArticleReactions.Add(new ArticleReaction
+                {
+                    ArticleId = articleId,
+                    UserId = authorId,
+                    Reaction = reaction
+                });
+            }
+            else
+            {
+                existing.Reaction = reaction;
+                _context.ArticleReactions.Update(existing);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        //public async Task<IEnumerable<ArticleComment>> GetCommentsAsync(int articleId)
+        //{
+        //    return await _context.ArticleComments
+        //        .Where(c => c.ArticleId == articleId)
+        //        .Include(c => c.Author)
+        //        .Include(c => c.Reactions)
+        //        .OrderByDescending(c => c.PostedAt)
+        //        .ToListAsync();
+        //}
+
+        public async Task<int> CountReactionsAsync(int articleId, ReactionType reactionType)
+        {
+            return await _context.ArticleReactions
+                .CountAsync(r => r.ArticleId == articleId && r.Reaction == reactionType);
+        }
+
+        public Task<List<Article>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Article> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

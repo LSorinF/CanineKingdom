@@ -4,6 +4,7 @@ using CanineKingdom.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CanineKingdom.Migrations
 {
     [DbContext(typeof(CanineDbContext))]
-    partial class CanineDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520095202_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,6 +125,36 @@ namespace CanineKingdom.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Articles");
+                });
+
+            modelBuilder.Entity("CanineKingdom.Models.ArticleComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArticleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PostedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("ArticleComments");
                 });
 
             modelBuilder.Entity("CanineKingdom.Models.ArticleReaction", b =>
@@ -252,14 +285,13 @@ namespace CanineKingdom.Migrations
                     b.Property<int>("UserAccountNumber")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ArticleCommentId");
 
                     b.HasIndex("CommentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserAccountNumber");
 
                     b.ToTable("CommentReactions");
                 });
@@ -503,6 +535,25 @@ namespace CanineKingdom.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("CanineKingdom.Models.ArticleComment", b =>
+                {
+                    b.HasOne("CanineKingdom.Models.Article", "Article")
+                        .WithMany("Comments")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CanineKingdom.Models.ApplicationUser", "Author")
+                        .WithMany("ArticleComments")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Article");
+
+                    b.Navigation("Author");
+                });
+
             modelBuilder.Entity("CanineKingdom.Models.ArticleReaction", b =>
                 {
                     b.HasOne("CanineKingdom.Models.Article", "Article")
@@ -547,15 +598,22 @@ namespace CanineKingdom.Migrations
 
             modelBuilder.Entity("CanineKingdom.Models.CommentReaction", b =>
                 {
+                    b.HasOne("CanineKingdom.Models.ArticleComment", "ArticleComment")
+                        .WithMany("Reactions")
+                        .HasForeignKey("ArticleCommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("CanineKingdom.Models.Comment", null)
                         .WithMany("Reactions")
                         .HasForeignKey("CommentId");
 
                     b.HasOne("CanineKingdom.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UserAccountNumber")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ArticleComment");
 
                     b.Navigation("User");
                 });
@@ -633,7 +691,19 @@ namespace CanineKingdom.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CanineKingdom.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("ArticleComments");
+                });
+
             modelBuilder.Entity("CanineKingdom.Models.Article", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Reactions");
+                });
+
+            modelBuilder.Entity("CanineKingdom.Models.ArticleComment", b =>
                 {
                     b.Navigation("Reactions");
                 });

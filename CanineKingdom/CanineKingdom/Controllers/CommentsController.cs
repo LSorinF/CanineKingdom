@@ -1,9 +1,11 @@
 ﻿using CanineKingdom.Models;
 using CanineKingdom.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CanineKingdom.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class CommentsController : Controller
     {
         private readonly ICommentService _commentService;
